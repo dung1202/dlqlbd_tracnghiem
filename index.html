@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+
+<!-- Responsive cho điện thoại -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Trắc nghiệm chương 1</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#eef3f9;
+    color:#222;
+    -webkit-text-size-adjust:100%;
+}
+
+/* HEADER */
+.header{
+    background:#0a4a8a;
+    color:white;
+    padding:14px 16px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+
+    min-height:56px;
+}
+
+#timer{
+    position:absolute;
+    right:15px;
+    font-size:16px;
+    font-weight:bold;
+    background:#083b70;
+    padding:6px 9px;
+    border-radius:6px;
+}
+
+/* CONTAINER */
+.container{
+    width:calc(100% - 24px);
+    max-width:900px;
+    margin:15px auto;
+    background:white;
+    padding:18px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* QUESTION */
+.question{
+    margin-top:20px;
+    margin-bottom:10px;
+    font-weight:bold;
+    font-size:16px;
+    line-height:1.5;
+}
+
+/* ANSWERS */
+.answers{
+    width:100%;
+}
+
+.answers label{
+    display:block;
+    margin:7px 0;
+    padding:10px 9px;
+    border-radius:7px;
+    cursor:pointer;
+    line-height:1.5;
+    font-size:16px;
+
+    border:1px solid #e0e6ed;
+    background:#fff;
+
+    /* Giúp bấm dễ trên màn hình cảm ứng */
+    min-height:44px;
+
+    transition:background 0.15s;
+}
+
+.answers label:hover{
+    background:#f0f6ff;
+}
+
+.answers input{
+    width:18px;
+    height:18px;
+    margin-right:8px;
+    vertical-align:middle;
+}
+
+/* ĐÚNG / SAI */
+.correct{
+    background:#c8f7c5 !important;
+    border-color:#5cb85c !important;
+}
+
+.wrong{
+    background:#f7c5c5 !important;
+    border-color:#d9534f !important;
+}
+
+/* BUTTON */
+button{
+    padding:12px 20px;
+    margin:8px 4px;
+    background:#0a74da;
+    color:white;
+    border:none;
+    border-radius:7px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    min-height:44px;
+}
+
+button:active{
+    transform:scale(0.97);
+}
+
+/* RESULT */
+#result{
+    margin-top:18px;
+    text-align:center;
+    font-size:18px;
+    line-height:1.6;
+    font-weight:bold;
+}
+
+/* =========================
+   IPHONE / MOBILE
+========================= */
+@media screen and (max-width:600px){
+
+    .header{
+        padding:12px 10px;
+        font-size:18px;
+        min-height:54px;
+    }
+
+    #timer{
+        right:8px;
+        font-size:14px;
+        padding:5px 7px;
+    }
+
+    .container{
+        width:calc(100% - 16px);
+        margin:8px auto;
+        padding:12px;
+        border-radius:8px;
+    }
+
+    .question{
+        margin-top:18px;
+        margin-bottom:8px;
+        font-size:16px;
+        line-height:1.5;
+    }
+
+    .answers label{
+        font-size:16px;
+        padding:11px 8px;
+        margin:6px 0;
+        line-height:1.45;
+    }
+
+    .answers input{
+        width:18px;
+        height:18px;
+    }
+
+    #submitArea{
+        text-align:center;
+    }
+
+    button{
+        width:calc(50% - 12px);
+        margin:8px 4px;
+        padding:12px 5px;
+        font-size:15px;
+    }
+}
+
+/* Màn hình rất nhỏ */
+@media screen and (max-width:380px){
+
+    .header{
+        font-size:16px;
+    }
+
+    #timer{
+        font-size:13px;
+    }
+
+    .container{
+        width:calc(100% - 10px);
+        padding:9px;
+    }
+
+    .question{
+        font-size:15px;
+    }
+
+    .answers label{
+        font-size:15px;
+    }
+
+    button{
+        font-size:14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    TRẮC NGHIỆM CHƯƠNG 1
+    <span id="timer">15:00</span>
+</div>
+
+<div class="container">
+
+    <form id="quiz"></form>
+
+    <div id="submitArea"></div>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+const data = [{
+        "q": "Tin tức là gì:",
+        "a": [
+            0,
+            "Tin tức là nội dung chứa đựng bên trong một sự kiện, một biến cố hay một quá trình nào đó mà người nhận sẽ thu được thông tin từ nó.",
+            "Tin tức được hiểu là một biến cố hay một quá trình nào đó mà người nhận sẽ thu được thông tin từ nó.",
+            "Tin tức là nội dung chứa đựng bên trong một sự kiện nào đó mà người nhận sẽ thu được thông tin từ nó.",
+            "Tin tức được hiểu là nội dung chứa đựng bên trong một sự kiện, một biến cố hay một quá trình nào đó mà người nhận sẽ thu được thông tin từ nó."
+        ],
+        "c": 4
+    },
+    {
+        "q": "Nguồn tin là gì?",
+        "a": [
+            0,
+            "Nguồn tin là nơi sản sinh ra thông tin",
+            "Nguồn tin là nơi sản sinh ra tín hiệu",
+            "Nguồn tin là nơi sản sinh ra văn bản",
+            "Nguồn tin là nơi sản sinh ra hình ảnh"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Nguồn tin liên tục:",
+        "a": [
+            0,
+            "Là bản tin biến đổi liên tục theo không gian",
+            "Là bản tin biến đổi liên tục theo thời gian",
+            "Là bản tin biến đổi liên tục theo địa điểm",
+            "Là bản tin biến đổi liên tục theo môi trường"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Nguồn tin rời rạc:",
+        "a": [
+            0,
+            "Là bản tin biến đổi rời rạc theo không gian",
+            "Là bản tin biến đổi rời rạc theo thời gian",
+            "Là bản tin biến đổi rời rạc theo môi trường",
+            "Là bản tin biến đổi rời rạc theo địa điểm"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Tín hiệu là:",
+        "a": [
+            0,
+            "Tín hiệu là khái niệm để mô tả các biểu hiện vật lý của nguồn tin",
+            "Tín hiệu là khái niệm để mô tả tin tức",
+            "Tín hiệu là khái niệm để mô tả các biểu hiện vật lý của tin tức",
+            "Tín hiệu là khái niệm để mô tả các biểu hiện vật lý của thông tin"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Tín hiệu liên tục theo thời gian:",
+        "a": [
+            0,
+            "Nếu đại lượng vật lý chuyển tin là một hàm liên tục theo thời gian",
+            "Nếu đại lượng vật lý tải tin là một hàm liên tục theo thời gian",
+            "Nếu đại lượng vật lý tải tin là một hàm liên tục theo không gian",
+            "Nếu đại lượng vật lý tải tin là một hàm liên tục theo địa điểm"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Tín hiệu rời rạc theo thời gian:",
+        "a": [
+            0,
+            "Nếu đại lượng vật lý chuyển tin là một hàm rời rạc theo thời gian",
+            "Nếu đại lượng vật lý tải tin là một hàm rời rạc theo địa điểm",
+            "Nếu đại lượng vật lý tải tin là một hàm rời rạc theo không gian",
+            "Nếu đại lượng vật lý tải tin là một hàm rời rạc theo thời gian"
+        ],
+        "c": 4
+    },
+    {
+        "q": "Tín hiệu tương tự:",
+        "a": [
+            0,
+            "Là tín hiệu mà đại lượng vật lý tải tin biến đổi tương tự theo bản tin [đồ thị thanh áp giống đồ thị hàm s(t) và là một hàm liên tục theo thời gian",
+            "Độ sai lệch giữa tần số công tác thực tế với tần số chỉ thị trên mặt độ số của máy thu",
+            "Độ sai lệch giữa tần số công tác thực tế với tần số chỉ thị trên mặt độ số của máy phát",
+            "Độ sai lệch giữa tần số công tác trên lý thuyết với tần số chỉ thị trên mặt độ số của máy phát"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Độ ổn định tần số công tác là:",
+        "a": [
+            0,
+            "Mức độ thay đổi tần số công tác so với tần số đặt ban đầu của máy phát do tác động của tất cả các yếu tố bên trong và bên ngoài",
+            "Mức độ thay đổi tần số công tác so với tần số đặt ban đầu của máy thu do tác động của tất cả các yếu tố bên trong và bên ngoài",
+            "Mức độ thay đổi tần số công tác so với tần số đặt ban đầu của máy phát do tác động của tất cả các yếu tố bên ngoài",
+            "Mức độ thay đổi tần số công tác so với tần số đặt ban đầu của máy phát do tác động của tất cả các yếu tố bên trong"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Công suất máy phát là:",
+        "a": [
+            0,
+            "Công suất của tín hiệu cao tần từ máy phát đưa ra anten",
+            "Công suất của tín hiệu trung tần từ máy phát đưa ra anten",
+            "Công suất của tín hiệu âm tần từ máy phát đưa ra anten",
+            "Công suất của tín hiệu cao tần từ máy thu đưa ra anten"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Nhiễu là gì?",
+        "a": [
+            0,
+            "Là những tín hiệu không mong muốn làm sai lệch thông tin",
+            "Là những tín hiệu có ích trong truyền tin",
+            "Là những tín hiệu làm tăng chất lượng truyền tin",
+            "Là những tín hiệu không ảnh hưởng đến thông tin"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Nhiễu tạp âm là:",
+        "a": [
+            0,
+            "Các tín hiệu nhiễu do con người tạo ra",
+            "Các tín hiệu nhiễu ngẫu nhiên trong tự nhiên",
+            "Các tín hiệu nhiễu có quy luật",
+            "Các tín hiệu nhiễu từ máy phát"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Nhiễu xuyên kênh là:",
+        "a": [
+            0,
+            "Nhiễu do các kênh khác gây ra",
+            "Nhiễu do cùng một kênh gây ra",
+            "Nhiễu do môi trường gây ra",
+            "Nhiễu do anten gây ra"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Nhiễu tần số ảnh là:",
+        "a": [
+            0,
+            "Một tần số nhiễu lọt vào máy thu qua đổi tần cũng cho ra tần số trung gian",
+            "Một tần số nhiễu lọt vào máy thu qua đổi tần cũng cho ra tần số âm tần",
+            "Một tần số nhiễu lọt vào máy thu qua đổi tần cũng cho ra tần số cao tần",
+            "Một tần số nhiễu không ảnh hưởng đến máy thu"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Nhiễu tần số lân cận là:",
+        "a": [
+            0,
+            "Các tần số nhiễu cách xa với tần số tín hiệu",
+            "Các tần số nhiễu gần với tần số tín hiệu",
+            "Các tần số nhiễu không liên quan",
+            "Các tần số không gây nhiễu"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Nhiễu tần số trung gian là:",
+        "a": [
+            0,
+            "Các tần số nhiễu đúng bằng tần số trung gian lọt vào máy thu",
+            "Các tần số nhiễu gần bằng tần số trung gian lọt vào máy thu",
+            "Các tần số nhiễu không liên quan",
+            "Các tần số nhiễu ở đầu vào anten"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Tỷ số tín hiệu trên nhiễu (S/N) là:",
+        "a": [
+            0,
+            "Tỷ số giữa công suất tín hiệu và công suất nhiễu",
+            "Tỷ số giữa tần số tín hiệu và nhiễu",
+            "Tỷ số giữa điện áp và dòng điện",
+            "Tỷ số giữa công suất phát và thu"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Biện pháp giảm nhiễu là:",
+        "a": [
+            0,
+            "Tăng công suất nhiễu",
+            "Giảm công suất tín hiệu",
+            "Lọc nhiễu và tăng chất lượng tín hiệu",
+            "Không cần xử lý nhiễu"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Nhiễu nội tại là:",
+        "a": [
+            0,
+            "Nhiễu sinh ra bên trong thiết bị",
+            "Nhiễu từ môi trường bên ngoài",
+            "Nhiễu do con người tạo ra",
+            "Nhiễu từ anten"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Nhiễu bên ngoài là:",
+        "a": [
+            0,
+            "Nhiễu sinh ra trong thiết bị",
+            "Nhiễu từ môi trường bên ngoài",
+            "Nhiễu không tồn tại",
+            "Nhiễu từ dây dẫn"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Dải tần số sóng ngắn:",
+        "a": [
+            0,
+            "(3¸20) MHz",
+            "(10¸30) MHz",
+            "(20¸30) MHz",
+            "(3¸30) MHz"
+        ],
+        "c": 4
+    },
+    {
+        "q": "Dải tần số sóng cực ngắn:",
+        "a": [
+            0,
+            "(30 ¸ 200) MHz",
+            "(30 ¸ 300) MHz",
+            "(20 ¸ 300) MHz",
+            "(30 ¸ 100) MHz"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Máy phát có mấy chức năng cơ bản?",
+        "a": [
+            0,
+            "3",
+            "4",
+            "5",
+            "6"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Máy thu có mấy chức năng cơ bản?",
+        "a": [
+            0,
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Máy phát công suất lớn có:",
+        "a": [
+            0,
+            "P ≥ 500W",
+            "P ≥ 350W",
+            "P ≥ 300W",
+            "P ≥ 400W"
+        ],
+        "c": 4
+    },
+    {
+        "q": "Máy phát công suất trung bình có:",
+        "a": [
+            0,
+            "P = (40 ¸ 400)W",
+            "P = (50 ¸ 300)W",
+            "P = (60 ¸ 400)W",
+            "P = (50 ¸ 400)W"
+        ],
+        "c": 4
+    },
+    {
+        "q": "Máy phát công suất nhỏ có:",
+        "a": [
+            0,
+            "P < 40W",
+            "P < 50W",
+            "P < 60W",
+            "P < 30W"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Phân loại máy thu theo độ nhạy?",
+        "a": [
+            0,
+            "Có máy thu cấp 1, cấp 3",
+            "Có máy thu cấp 1, cấp 2, cấp 3",
+            "Có máy thu cấp 2, cấp 3",
+            "Có máy thu cấp 1, cấp 2"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Sơ đồ khối cơ bản của một máy phát vô tuyến điện gồm:",
+        "a": [
+            0,
+            "4 khối",
+            "5 khối",
+            "3 khối",
+            "6 khối"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Bộ dao động chủ sóng có nhiệm vụ:",
+        "a": [
+            0,
+            "Tạo ra dao động trung tần sơ cấp",
+            "Tạo ra dao động âm tần sơ cấp",
+            "Tạo ra dao động cao tần sơ cấp",
+            "Tạo ra dao động cao tần thứ cấp"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Nhiễu tần số ảnh là:",
+        "a": [
+            0,
+            "Một tần số nhiễu lọt vào máy thu qua đổi tần cũng cho ra tần số trung gian",
+            "Một tần số nhiễu lọt vào máy thu qua đổi tần cũng cho ra tần số âm tần",
+            "Một tần số nhiễu lọt vào máy thu qua đổi tần cũng cho ra tần số cao tần",
+            "Một tần số nhiễu không ảnh hưởng đến máy thu"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Nhiễu tần số lân cận là:",
+        "a": [
+            0,
+            "Các tần số nhiễu cách xa với tần số tín hiệu",
+            "Các tần số nhiễu gần với tần số tín hiệu",
+            "Các tần số nhiễu không liên quan",
+            "Các tần số không gây nhiễu"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Nhiễu tần số trung gian là:",
+        "a": [
+            0,
+            "Các tần số nhiễu đúng bằng tần số trung gian lọt vào máy thu",
+            "Các tần số nhiễu gần bằng tần số trung gian lọt vào máy thu",
+            "Các tần số nhiễu không liên quan",
+            "Các tần số nhiễu ở đầu vào anten"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Sơ đồ khối đơn giản của một máy thu đổi tần gồm:",
+        "a": [
+            0,
+            "7 khối",
+            "6 khối",
+            "8 khối",
+            "5 khối"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Bộ trộn tần có nhiệm vụ:",
+        "a": [
+            0,
+            "Khuếch đại tín hiệu",
+            "Trộn tín hiệu để tạo ra tần số trung gian",
+            "Lọc tín hiệu",
+            "Tạo dao động âm tần"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Bộ khuếch đại cao tần có nhiệm vụ:",
+        "a": [
+            0,
+            "Khuếch đại tín hiệu trước khi đổi tần",
+            "Khuếch đại tín hiệu sau khi đổi tần",
+            "Tạo dao động",
+            "Lọc nhiễu"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Bộ khuếch đại trung tần có nhiệm vụ:",
+        "a": [
+            0,
+            "Khuếch đại tín hiệu cao tần",
+            "Khuếch đại tín hiệu trung gian",
+            "Khuếch đại tín hiệu âm tần",
+            "Tạo dao động"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Bộ tách sóng có nhiệm vụ:",
+        "a": [
+            0,
+            "Tách tín hiệu thông tin khỏi sóng mang",
+            "Khuếch đại tín hiệu",
+            "Lọc tín hiệu",
+            "Tạo sóng mang"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Bộ khuếch đại âm tần có nhiệm vụ:",
+        "a": [
+            0,
+            "Khuếch đại tín hiệu âm tần để đưa ra loa",
+            "Khuếch đại tín hiệu cao tần",
+            "Khuếch đại tín hiệu trung tần",
+            "Tạo dao động"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Loa có nhiệm vụ:",
+        "a": [
+            0,
+            "Biến tín hiệu điện thành âm thanh",
+            "Biến âm thanh thành tín hiệu điện",
+            "Khuếch đại tín hiệu",
+            "Lọc tín hiệu"
+        ],
+        "c": 1
+    },
+    {
+        "q": "Sóng đất (sóng bề mặt) là:",
+        "a": [
+            0,
+            "Các sóng truyền lan dọc theo tầng đối lưu",
+            "Các sóng truyền lan dọc theo tầng điện ly",
+            "Các sóng truyền lan dọc theo bề mặt quả đất",
+            "Các sóng truyền lan dọc theo tầng bình lưu"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Sóng trời là:",
+        "a": [
+            0,
+            "Các sóng đi tới các lớp riêng biệt của tầng ion và không phản xạ lại",
+            "Các sóng đi tới các lớp chung của tầng ion và không phản xạ lại",
+            "Các sóng đi tới các lớp riêng biệt của tầng ion và phản xạ lại",
+            "Các sóng đi tới các lớp chung của tầng ion và phản xạ lại"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Có mấy loại anten thường dùng trong quân sự?",
+        "a": [
+            0,
+            "5",
+            "2",
+            "4",
+            "3"
+        ],
+        "c": 4
+    },
+    {
+        "q": "Anten cần là:",
+        "a": [
+            0,
+            "Loại anten sóng trời nhưng làm bằng những ống kim loại nối lại với nhau",
+            "Loại anten thẳng đứng nhưng làm bằng những ống nhựa nối lại với nhau",
+            "Loại anten thẳng đứng nhưng làm bằng những ống kim loại nối lại với nhau",
+            "Loại anten trực tiếp nhưng làm bằng những ống kim loại nối lại với nhau"
+        ],
+        "c": 3
+    },
+    {
+        "q": "Anten dây khẩn cấp 3m:",
+        "a": [
+            0,
+            "Là một đoạn ống kim loại dài 3m có vỏ bọc cách điện, một đầu được cách điện còn một đầu được nối sẵn với đầu cắm chuyên dụng",
+            "Là một đoạn dây dài 3m có vỏ bọc cách điện, một đầu được cách điện còn một đầu được nối sẵn với đầu cắm chuyên dụng",
+            "Là một đoạn dây dài 4m có vỏ bọc cách điện, một đầu được cách điện còn một đầu được nối sẵn với đầu cắm chuyên dụng",
+            "Là một đoạn dây dài 5m có vỏ bọc cách điện, một đầu được cách điện còn một đầu được nối sẵn với đầu cắm chuyên dụng"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Tác dụng của anten:",
+        "a": [
+            0,
+            "Biến đổi năng lượng dòng điện cao tần thành sóng điện từ khi phát",
+            "Cả đáp án 1 và 3",
+            "Thu năng lượng sóng điện từ và biến thành dòng cao tần khi thu",
+            "Biến đổi năng lượng trung tần thành sóng điện từ"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Anten cần đài VTĐ P-123M có mấy đốt?",
+        "a": [
+            0,
+            "3",
+            "4",
+            "5",
+            "2"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Anten cần đài VTĐ VRU-812/S có mấy đốt?",
+        "a": [
+            0,
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Mũ công tác trên xe tăng thiết giáp gồm:",
+        "a": [
+            0,
+            "9",
+            "10",
+            "8",
+            "7"
+        ],
+        "c": 2
+    },
+    {
+        "q": "Tác dụng của mũ công tác trên xe tăng thiết giáp:",
+        "a": [
+            0,
+            "Dùng để bảo vệ đầu người sử dụng",
+            "Tất cả các tác dụng",
+            "Thu và phát tín hiệu trong xe và qua đài vô tuyến điện",
+            "Ngăn tiếng ồn của xe"
+        ],
+        "c": 2
+    }];
+
+// ===== TRỘN CÂU HỎI =====
+function shuffle(arr){
+    return arr.sort(() => Math.random() - 0.5);
+}
+
+shuffle(data);
+
+let cauhoi = 10;
+
+// ===== HIỂN THỊ CÂU HỎI =====
+const quiz = document.getElementById("quiz");
+
+data.forEach((item, i) => {
+if (cauhoi > i){
+    let answers = item.a.map((text, index) => ({
+        text,
+        correct:index === item.c
+    }));
+
+    answers = shuffle(answers);
+
+    let html = `
+        <div class="question">
+            Câu ${i + 1}: ${item.q}
+        </div>
+
+        <div class="answers">
+    `;
+
+    answers.forEach(ans => {
+
+        if(ans.text != 0){
+            html += `
+                <label>
+                    <input
+                        type="radio"
+                        name="q${i}"
+                        value="${ans.correct}"
+                    >
+                    ${ans.text}
+                </label>
+            `;
+        }
+
+    });
+
+    html += `</div>`;
+
+    quiz.innerHTML += html;}
+});
+
+// ===== NÚT NỘP =====
+document.getElementById("submitArea").innerHTML = `
+    <div style="margin-top:20px;text-align:center;">
+        <button type="button" onclick="grade()">Nộp bài</button>
+        <button type="button" onclick="location.reload()">Làm lại</button>
+    </div>
+`;
+
+// ===== ĐẾM GIỜ =====
+let time = 900;
+
+let timer = setInterval(() => {
+
+    let m = Math.floor(time / 60);
+    let s = time % 60;
+
+    document.getElementById("timer").innerText =
+        `${m}:${s < 10 ? "0" + s : s}`;
+
+    time--;
+
+    if(time < 0){
+        clearInterval(timer);
+        grade();
+    }
+
+},1000);
+
+// ===== CHẤM ĐIỂM =====
+function grade(){
+
+    clearInterval(timer);
+
+    let score = 0;
+
+    data.forEach((_, i) => {
+
+        let selected =
+            document.querySelector(`input[name="q${i}"]:checked`);
+
+        let list =
+            document.querySelectorAll(`input[name="q${i}"]`);
+
+        list.forEach(el => {
+
+            el.disabled = true;
+
+            el.parentElement.classList.remove(
+                "correct",
+                "wrong"
+            );
+
+        });
+
+        if(selected){
+
+            if(selected.value === "true"){
+
+                score++;
+
+                selected.parentElement.classList.add("correct");
+
+            }else{
+
+                selected.parentElement.classList.add("wrong");
+
+                let correct =
+                    document.querySelector(
+                        `input[name="q${i}"][value="true"]`
+                    );
+
+                if(correct){
+                    correct.parentElement.classList.add("correct");
+                }
+            }
+        }
+    });
+
+    let msg = "";
+
+    if(score / cauhoi >= 45 / 50)
+        msg = "🏆 Xuất sắc";
+
+    else if(score / cauhoi >= 35 / 50)
+        msg = "🎉 Giỏi";
+
+    else if(score / cauhoi >= 25 / 50)
+        msg = "👍 Khá";
+
+    else if(score / cauhoi >= 15 / 50)
+        msg = "🙂 Trung bình";
+
+    else
+        msg = "❌ Cần ôn lại";
+
+    document.getElementById("result").innerHTML =
+        `Kết quả: ${score}/${cauhoi}<br><b>${msg}</b>`;
+}
+</script>
+
+</body>
+</html>
